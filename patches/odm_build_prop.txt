@@ -1,0 +1,3 @@
+# Append to /odm/etc/build.prop (0644 root:root, u:object_r:vendor_configs_file:s0)
+persist.vendor.camera.mialgo.capdepth.debuglitemode=0
+persist.vendor.camera.mialgo.capbokeh.debuglitemode=0

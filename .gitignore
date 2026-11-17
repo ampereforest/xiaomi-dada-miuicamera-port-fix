@@ -1,0 +1,19 @@
+# Compiled binaries, ROM images, APKs, and media assets must never be committed
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.dng
+*.apk
+*.so
+*.img
+*.zip
+*.tar.gz
+*.tgz
+*.idsig
+*.log
+__pycache__/
+.DS_Store
+build/
+dist/
+out/

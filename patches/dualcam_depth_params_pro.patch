@@ -1,0 +1,13 @@
+--- a/odm/etc/camera/dualcam_depth_params_pro.json
++++ b/odm/etc/camera/dualcam_depth_params_pro.json
+@@ -230,8 +230,8 @@
+   "StructPostProSwitch": {
+     "paramNonEdge": 1,
+     "paramDTF": 1,
+-    "paramSDR": 1,
+-    "paramSDRT": 0.03
++    "paramSDR": 0,
++    "paramSDRT": 0.0
+   },
+   "StructTimeControl": {
+     "paramOvertimeThres": 4000

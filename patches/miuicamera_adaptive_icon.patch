@@ -1,0 +1,20 @@
+--- a/AndroidManifest.xml
++++ b/AndroidManifest.xml
+@@ -123,7 +123,7 @@
+     <uses-permission android:name="com.android.camera.permission.DebugProvider"/>
+     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+-    <application android:allowBackup="false" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:dataExtractionRules="@xml/j1t" android:enableOnBackInvokedCallback="false" android:extractNativeLibs="false" android:fullBackupContent="@xml/j1s" android:hardwareAccelerated="true" android:icon="@mipmap/flb" android:label="@string/g56" android:largeHeap="true" android:name="com.android.camera.CameraAppImpl" android:resizeableActivity="false" android:supportsRtl="true" android:theme="@style/iqt">
++    <application android:allowBackup="false" android:appComponentFactory="androidx.core.app.CoreComponentFactory" android:dataExtractionRules="@xml/j1t" android:enableOnBackInvokedCallback="false" android:extractNativeLibs="false" android:fullBackupContent="@xml/j1s" android:hardwareAccelerated="true" android:icon="@mipmap/flb" android:roundIcon="@mipmap/flb" android:label="@string/g56" android:largeHeap="true" android:name="com.android.camera.CameraAppImpl" android:resizeableActivity="false" android:supportsRtl="true" android:theme="@style/iqt">
+         <provider android:authorities="com.android.camera.androidx-startup" android:exported="false" android:name="androidx.startup.InitializationProvider">
+             <meta-data android:name="com.xiaomi.camera.cloudconfig.CloudConfigInitializer" android:value="androidx.startup"/>
+             <meta-data android:name="com.xiaomi.camera.cta.requester.CTAInitializer" android:value="androidx.startup"/>
+--- /dev/null
++++ b/res/mipmap-anydpi-v26/flb.xml
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="utf-8"?>
++<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
++    <background android:drawable="@mipmap/flb_bg" />
++    <foreground android:drawable="@mipmap/flb_fg" />
++    <monochrome android:drawable="@mipmap/flb_mono" />
++</adaptive-icon>

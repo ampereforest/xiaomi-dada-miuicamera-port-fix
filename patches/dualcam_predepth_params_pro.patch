@@ -1,0 +1,11 @@
+--- a/odm/etc/camera/dualcam_predepth_params_pro.json
++++ b/odm/etc/camera/dualcam_predepth_params_pro.json
+@@ -54,6 +54,6 @@
+       "paramBmDspSwitch": 1,
+       "paramMatteGpuSwitch": 1
+     },
+-    "paramIsTrustAfCode": 1
++    "paramIsTrustAfCode": 0
+   }
+ }
+\ No newline at end of file
