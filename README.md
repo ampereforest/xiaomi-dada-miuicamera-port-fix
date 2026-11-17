@@ -1,6 +1,6 @@
 # Xiaomi 15 (`dada`) MiuiCamera Fixes for ColorOS 17 Ports
 
-Permanent native framework shims, `MiuiCamera.apk` smali/adaptive-icon patches, and `/odm` Portrait depth tuning for running HyperOS `MiuiCamera` (`6.7.000180.0`) on **ColorOS 17 (`OnePlus/PLZ110/OP64DDL1`, Android 17 / API 37)** ported to **Xiaomi 15 (`dada`, `24129PN74G`)** with Xiaomi `OS4.0.0.11.XOCMIXM` / `OS4.0.0.22.XOCCN` ODM/HAL blobs.
+Permanent native framework shims, `MiuiCamera.apk` smali/adaptive-icon patches, and `/odm` Portrait depth tuning for running HyperOS `MiuiCamera` (`6.7.000180.0`) on **ColorOS 17 (`OnePlus/PLZ110/OP64DDL1`, Android 17 / API 37)** ported to **Xiaomi 15 (`dada`, `24129PN74G`)** with Xiaomi `OS4.0.0.11.XOCMIXM` / `OS4.0.0.22.XOCCNXM` ODM/HAL blobs.
 
 > **Important Scope Notice:** This repository provides source code, unified patches, icon-porting tooling, and ROM partition integration guides for ROM porters (`system`, `product`, `odm`, and `super.img` repacking). `MiuiCamera.apk` and proprietary firmware images are **not** redistributed here.
 
@@ -63,4 +63,4 @@ Permanent native framework shims, `MiuiCamera.apk` smali/adaptive-icon patches, 
 ## Credits
 
 - **`turbo-boo/android_device_xiaomi_dada-miuicamera`** — Initial `DngCreator` / `8192x6144` full-resolution RAW metadata research for Xiaomi 15 (`dada`).
-- Xiaomi `dada` HyperOS (`OS4.0.0.11.XOCMIXM` / `OS4.0.0.22.XOCCN`) & ColorOS 17 (`OnePlus/PLZ110/OP64DDL1`) port engineering contributors.
+- Xiaomi `dada` HyperOS (`OS4.0.0.11.XOCMIXM` / `OS4.0.0.22.XOCCNXM`) & ColorOS 17 (`OnePlus/PLZ110/OP64DDL1`) port engineering contributors.
