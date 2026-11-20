@@ -1,5 +1,116 @@
+diff --git a/odm/etc/camera/dualcam_depth_params_pro.json b/odm/etc/camera/dualcam_depth_params_pro.json
+index 42389d1..86103e5 100644
 --- a/odm/etc/camera/dualcam_depth_params_pro.json
 +++ b/odm/etc/camera/dualcam_depth_params_pro.json
+@@ -8,7 +8,7 @@
+       "paramM-1": 9,
+       "StructRear": {
+         "paramC": -10,
+-        "paramD": 64
++        "paramD": 96
+       },
+       "StructFront": {
+         "paramC": -45,
+@@ -18,20 +18,20 @@
+         "paramA": 31,
+         "paramB": 31,
+         "paramG": 0,
+-        "paramT": 500,
++        "paramT": 150,
+         "paramM-2": 20,
+         "paramSR": 0
+       },
+       "StructSGBM": {
+         "paramSC": 1,
+         "paramCM": 1,
+-        "paramH": 200,
+-        "paramI": 16,
+-        "paramU": 30,
++        "paramH": 80,
++        "paramI": 8,
++        "paramU": 12,
+         "paramJ": 17,
+         "paramP1": 7,
+         "paramP2": 32,
+-        "paramSP": 1
++        "paramSP": 0
+       }
+     },
+     "Struct_HOT": {
+@@ -41,7 +41,7 @@
+       "paramM-1": 9,
+       "StructRear": {
+         "paramC": -10,
+-        "paramD": 64
++        "paramD": 96
+       },
+       "StructFront": {
+         "paramC": -45,
+@@ -51,16 +51,16 @@
+         "paramA": 31,
+         "paramB": 31,
+         "paramG": 0,
+-        "paramT": 500,
++        "paramT": 150,
+         "paramM-2": 20,
+         "paramSR": 0
+       },
+       "StructSGBM": {
+         "paramSC": 1,
+         "paramCM": 1,
+-        "paramH": 200,
+-        "paramI": 16,
+-        "paramU": 30,
++        "paramH": 80,
++        "paramI": 8,
++        "paramU": 12,
+         "paramJ": 17,
+         "paramP1": 7,
+         "paramP2": 32,
+@@ -74,7 +74,7 @@
+       "paramM-1": 9,
+       "StructRear": {
+         "paramC": -10,
+-        "paramD": 64
++        "paramD": 96
+       },
+       "StructFront": {
+         "paramC": -45,
+@@ -84,20 +84,20 @@
+         "paramA": 31,
+         "paramB": 31,
+         "paramG": 0,
+-        "paramT": 500,
++        "paramT": 150,
+         "paramM-2": 20,
+         "paramSR": 0
+       },
+       "StructSGBM": {
+         "paramSC": 1,
+         "paramCM": 1,
+-        "paramH": 200,
+-        "paramI": 16,
+-        "paramU": 20,
++        "paramH": 80,
++        "paramI": 8,
++        "paramU": 12,
+         "paramJ": 17,
+         "paramP1": 7,
+         "paramP2": 32,
+-        "paramSP": 1
++        "paramSP": 0
+       }
+     }
+   },
+@@ -140,7 +140,7 @@
+     "paramW": 7,
+     "paramS": 5,
+     "paramGT": 0,
+-    "paramT": 200,
++    "paramT": 80,
+     "paramBF": 0,
+     "paramWR": 0.19,
+     "paramAR": 0.05
 @@ -230,8 +230,8 @@
    "StructPostProSwitch": {
      "paramNonEdge": 1,
@@ -11,3 +122,114 @@
    },
    "StructTimeControl": {
      "paramOvertimeThres": 4000
+@@ -244,8 +244,8 @@
+     "param_Tx": -18.3,
+     "param_Ty": -17.7,
+     "param_Tz": 0,
+-    "param_Fmm":23,
+-    "param_CstR":2.0,
++    "param_Fmm": 23,
++    "param_CstR": 2.0,
+     "param_BSwap": 1,
+     "param_algType3_Periscope": 0,
+     "param_algType3_RKr": 1,
+@@ -257,11 +257,11 @@
+       "param_MAINDIS2": 0.61,
+       "param_MAINDIS3": 1.15,
+       "param_MAINDIS4": 1.41,
+-      "param_MAINDIS5": 1.50,
++      "param_MAINDIS5": 1.5,
+       "param_MAINDIS6": 1.57,
+       "param_MAINDIS7": 1.65,
+       "param_MAINDIS8": 1.54,
+-      "param_MAINDIS9": 1.50,
++      "param_MAINDIS9": 1.5,
+       "param_MAINDIS10": 1.07
+     },
+     "StructD_MAIN_41": {
+@@ -280,15 +280,15 @@
+     "StructD_SUB_EE": {
+       "param_SUBDIS0": 0,
+       "param_SUBDIS1": 0,
+-      "param_SUBDIS2": -0.20,
+-      "param_SUBDIS3": -0.50,
+-      "param_SUBDIS4": -0.50,
+-      "param_SUBDIS5": -0.40,
+-      "param_SUBDIS6": -0.20,
+-      "param_SUBDIS7": -0.30,
+-      "param_SUBDIS8": -1.00,
+-      "param_SUBDIS9": -1.70,
+-      "param_SUBDIS10": -3.50
++      "param_SUBDIS2": -0.2,
++      "param_SUBDIS3": -0.5,
++      "param_SUBDIS4": -0.5,
++      "param_SUBDIS5": -0.4,
++      "param_SUBDIS6": -0.2,
++      "param_SUBDIS7": -0.3,
++      "param_SUBDIS8": -1.0,
++      "param_SUBDIS9": -1.7,
++      "param_SUBDIS10": -3.5
+     },
+     "StructD_SUB_43": {
+       "param_SUBDIS0": 0,
+@@ -311,8 +311,8 @@
+     "param_Tx": 18.3,
+     "param_Ty": 0,
+     "param_Tz": 0,
+-	"param_Fmm":60,
+-    "param_CstR":2.0,
++    "param_Fmm": 60,
++    "param_CstR": 2.0,
+     "param_BSwap": 1,
+     "param_algType3_Periscope": 0,
+     "param_algType3_RKr": 1,
+@@ -327,7 +327,7 @@
+       "param_MAINDIS5": 0.94,
+       "param_MAINDIS6": 1.25,
+       "param_MAINDIS7": 1.51,
+-      "param_MAINDIS8": 1.70,
++      "param_MAINDIS8": 1.7,
+       "param_MAINDIS9": 1.78,
+       "param_MAINDIS10": 1.81
+     },
+@@ -340,7 +340,7 @@
+       "param_MAINDIS5": 0.55,
+       "param_MAINDIS6": 0.79,
+       "param_MAINDIS7": 1.05,
+-      "param_MAINDIS8": 1.40,
++      "param_MAINDIS8": 1.4,
+       "param_MAINDIS9": 1.54,
+       "param_MAINDIS10": 1.57
+     },
+@@ -379,10 +379,10 @@
+     "param_LM_SD": 3.0,
+     "param_LM_SJ": 6.0,
+     "param_LM_MI": 50,
+-    "param_LM_DT": 1e-8,
++    "param_LM_DT": 1e-08,
+     "param_LM_DE": 1e-10,
+-    "param_LM_BE": 1e-8,
+-    "param_LM_CE": 1e-5
++    "param_LM_BE": 1e-08,
++    "param_LM_CE": 1e-05
+   },
+   "StructPublic_SmallFOV": {
+     "param_Q_Type": 3,
+@@ -423,14 +423,14 @@
+     "param_P_WinSize": 21,
+     "param_P_MaxLevel": 4,
+     "param_P_QualityLevel": 0.005
+-    },
++  },
+   "StructMt": {
+-    "paramMtS": 1,
++    "paramMtS": 0,
+     "paramMST": -1,
+     "paramSGT": 20.0,
+     "paramFNT": 2000,
+     "paramFVT": 250.0,
+-    "paramIuxT": 400
++    "paramIuxT": 9999
+   },
+   "StructAf": {
+     "paramMargin": 0.0
