@@ -12,14 +12,14 @@ Permanent native framework shims, `MiuiCamera.apk` smali/adaptive-icon patches, 
 | :--- | :--- | :--- | :--- | :--- |
 | **50MP Photo (`Ultra HD`)** | Cropped center output or failed `8192x6144` `BLOB` stream | ColorOS `libcameraservice.so` omits Xiaomi `0x81b90000` (`xiaomi.scaler.availableStreamConfigurations`) lookups in `getMaxJpegResolution` & `roundBufferDimensionNearest` | `libdada_camfix.so` (`DT_NEEDED` in `/system/lib64/libcameraservice.so`) resolves `8192x6144` `BLOB (33)` & `RAW_SENSOR (32)` | Full `6144x8192` / `8192x6144` uncropped JPEG |
 | **Pro 50MP RAW & Ultra RAW** | Green/corrupt `8192x6144` DNG metadata mismatch & missing DNG preview thumbnail (`SubIFD[0]`) | (1) `DngCreator` lacks 2x full-res sensor array fallback & `Xiaomi Ultra RAW` 14-bit (`0..16383`) overrides; (2) ColorOS `libandroid_runtime.so` lacks HyperOS `DngCreator.writeJpeg(IILjava/nio/ByteBuffer;)V` | `libdada_rtfix.so` (`DT_NEEDED` in `/system/lib64/libandroid_runtime.so`) + `n7/x.smali` `embedPreviewThumb()` generating `256x192` `ARGB_8888` `setThumbnail()` | `8192x6144` 10-bit Pro RAW + `4096x3072` 14-bit Ultra RAW with crisp `256x192` `SubIFD[0]` |
-| **Portrait Mode Bokeh (`1x` / `1.5x` / `2.6x`)** | Zero depth blur on the `1x` / `1.5x` Wide+UW path, or half-screen blur dropouts (Mono fallback) indoors; weak blur on non-human foreground objects | (1) `StructRear.paramD=64` + strict SGBM leave most of `sp_disp_map` empty at close range; (2) DenseNN near-depth prior + `useConstDR=1, dR=2.0/2.2`; (3) `StructMt.paramIuxT=400` forces indoor Dual→Mono fallback; (4) `StructCalDofRadius_Mono` attenuates non-face blur 4x–60x | Pure JSON tuning in `odm/etc/camera/` (`dualcam_depth`, `dualcam_predepth`, `dualcam_bokeh`); no `.so` or `MiuiCamera.apk` changes | Verified on a non-human scene: 3/3 consecutive `1x` `f/0.95` shots, lower-left light-bulb blur `BL` `0.03` → `0.63–1.28`. Human subjects not yet verified (see Known Limitations) |
+| **Portrait Mode Bokeh (`1x` / `1.5x` / `2.6x`)** | Zero depth blur on the `1x` / `1.5x` Wide+UW path, or half-screen blur dropouts (Mono fallback) indoors; weak blur on non-human foreground objects | (1) `StructRear.paramD=64` + strict SGBM leave most of `sp_disp_map` empty at close range; (2) DenseNN near-depth prior + `useConstDR=1, dR=2.0/2.2`; (3) `StructMt.paramIuxT=400` forces indoor Dual→Mono fallback; (4) `StructCalDofRadius_Mono` attenuates non-face blur 4x–60x | Patches to ODM camera configs (`dualcam_depth`, `dualcam_predepth`, `dualcam_bokeh`); no `.so` or `MiuiCamera.apk` changes | Verified on a non-human scene: 3/3 consecutive `1x` `f/0.95` shots, lower-left light-bulb blur `BL` `0.03` → `0.63–1.28`. Human subjects not yet verified (see Known Limitations) |
 | **Launcher Icon (Classic + Flux)** | Legacy HyperOS icon; missing ColorOS 17 `<adaptive-icon>` & `<monochrome>` layers | Ported `MiuiCamera.apk` shipped only legacy `.webp` icons; native `monochrome.png` (`92/180`) also scales smaller than ColorOS 17 Flux icons | `icon_port/port_coloros_icon.py` (`alpha_composite()`, `S_FG=0.96`, `S_MONO=1.524`) + `flb.xml` + `android:roundIcon="@mipmap/flb"` | Classic `halo/sq=0.914` (`center=(0,0)`); Flux `mono/sq=0.7812` (`+0.56%` vs native) |
 
 ---
 
 ## Portrait Mode Bokeh & Non-Human Subject Fix (Pure JSON)
 
-A pure ODM configuration fix: three camera tuning files, with zero `.so` or `MiuiCamera.apk` binary changes.
+A pure ODM configuration fix, shipped as three unified diffs. The repository contains no OEM or tuned JSON files, and no `.so` or `MiuiCamera.apk` binary changes.
 
 ### Root Causes
 
@@ -47,25 +47,41 @@ Verified on Xiaomi 15 (`dada`) running ColorOS 17, Portrait mode, with the produ
 - **Edge quality (1:1 unscaled crops):** clean edges on a non-human box (cardboard fibre, printed lettering, insect antennae), with no halo or foreground blur bleed.
 - **Stability:** no crashes and no `dualcam_*` SELinux denials during the verification run.
 
-### Applying
+### Applying (Patches Only)
 
-Option A, copy the tuned files into an ODM build that matches the OEM version:
+The repository ships only the three patches. Each patch targets the stock ODM file, so you must start from stock OEM JSONs. Pull them from a device whose `/odm` still runs OEM configs. A device that already has these changes staged will fail to apply the patches.
 
-```bash
-cp odm/etc/camera/dualcam_*_params_pro.json <odm>/etc/camera/
-```
-
-Option B, patch an OEM ODM. The on-device files use CRLF line endings, so normalize them to LF first. The patches expect LF.
+Run this from a working directory of your choice:
 
 ```bash
-# from the directory that contains odm/
-for f in depth predepth bokeh; do
-  sed -i 's/\r$//' odm/etc/camera/dualcam_${f}_params_pro.json
-  patch -p1 < patches/dualcam_${f}_params_pro.patch
-done
+# 1. Pull the stock ODM configs
+mkdir -p porting/odm/etc/camera && cd porting
+adb pull /odm/etc/camera/dualcam_depth_params_pro.json    odm/etc/camera/
+adb pull /odm/etc/camera/dualcam_predepth_params_pro.json odm/etc/camera/
+adb pull /odm/etc/camera/dualcam_bokeh_params_pro.json    odm/etc/camera/
+
+# 2. Strip CRLF so the patches apply
+sed -i 's/\r$//' odm/etc/camera/dualcam_*_params_pro.json
+
+# 3. Apply all three patches (run from the directory that contains odm/)
+patch -p1 < /path/to/xiaomi-dada-miuicamera-port-fix/patches/dualcam_depth_params_pro.patch
+patch -p1 < /path/to/xiaomi-dada-miuicamera-port-fix/patches/dualcam_predepth_params_pro.patch
+patch -p1 < /path/to/xiaomi-dada-miuicamera-port-fix/patches/dualcam_bokeh_params_pro.patch
+
+# 4. Check the results against the verified hashes
+sha256sum odm/etc/camera/dualcam_*_params_pro.json
+#   0ebbf6aa...  dualcam_depth_params_pro.json
+#   254c690a...  dualcam_predepth_params_pro.json
+#   1d74901b...  dualcam_bokeh_params_pro.json
+
+# 5. Push back to a Magisk module overlay with the required label and mode
+adb push odm/etc/camera/dualcam_depth_params_pro.json    /data/local/tmp/
+adb push odm/etc/camera/dualcam_predepth_params_pro.json /data/local/tmp/
+adb push odm/etc/camera/dualcam_bokeh_params_pro.json    /data/local/tmp/
+adb shell su -c 'D=/data/adb/modules/<your_module>/system/odm/etc/camera; mkdir -p $D && for f in dualcam_depth_params_pro dualcam_predepth_params_pro dualcam_bokeh_params_pro; do install -m 0644 -o root -g root /data/local/tmp/$f.json $D/$f.json && chcon u:object_r:vendor_configs_file:s0 $D/$f.json; done'
 ```
 
-Applying all three patches to LF-normalized OEM files reproduces the three SHA-256 values above. Set the file mode to `0644 root:root` with label `u:object_r:vendor_configs_file:s0`.
+Replace `<your_module>` with your Magisk module name, then reboot. The patched files are generated locally and must never be committed to this repository.
 
 ---
 
@@ -82,10 +98,6 @@ Applying all three patches to LF-normalized OEM files reproduces the three SHA-2
 │   ├── dada_rtfix.cpp                # libandroid_runtime.so DngCreator JNI hook (50MP RAW + Ultra RAW)
 │   ├── patch_elf_needed.py           # Clean AArch64 ELF64 PT_LOAD + DT_NEEDED injector
 │   └── build.sh                      # Android NDK r26+ C++ build script
-├── odm/etc/camera/
-│   ├── dualcam_depth_params_pro.json     # Tuned Portrait stereo depth (Checkpoint 71)
-│   ├── dualcam_predepth_params_pro.json  # Tuned DenseNN switch & AF trust
-│   └── dualcam_bokeh_params_pro.json     # Tuned DoF method & non-human Mono blur LUT
 ├── patches/
 │   ├── miuicamera_dng_thumbnail.patch    # Unified diff for smali/n7/x.smali
 │   ├── miuicamera_adaptive_icon.patch    # Unified diff for AndroidManifest.xml + flb.xml
@@ -105,7 +117,7 @@ Applying all three patches to LF-normalized OEM files reproduces the three SHA-2
 
 1. **Compile & Inject Native Shims (`system`):** See [docs/MANUAL_INTEGRATION_GUIDE.md](docs/MANUAL_INTEGRATION_GUIDE.md#1-build-and-inject-native-system-shims) or download the prebuilt `libdada_camfix.so` and `libdada_rtfix.so` from [GitHub Releases (`v1.0.0`)](../../releases).
 2. **Patch & Rebuild `MiuiCamera.apk` (`product`):** Apply `patches/miuicamera_dng_thumbnail.patch`, port ColorOS 17 icons with `icon_port/port_coloros_icon.py`, 16K-align (`zipalign -P 16 4`), sign v2+v3 (never ship `.apk.idsig` inside `/product/priv-app/MiuiCamera/`).
-3. **Apply ODM Portrait Configs & Props (`odm`):** Copy `odm/etc/camera/dualcam_*_params_pro.json` (or apply the three `patches/dualcam_*_params_pro.patch` files to LF-normalized OEM files, see [Applying](#applying)), and append `patches/odm_build_prop.txt` to `/odm/etc/build.prop`.
+3. **Apply ODM Portrait Patches & Props (`odm`):** Pull the stock `dualcam_*_params_pro.json` files, strip CRLF, and apply the three `patches/dualcam_*_params_pro.patch` files (see [Applying](#applying-patches-only)). Append `patches/odm_build_prop.txt` to `/odm/etc/build.prop`.
 4. **Rebuild EROFS & Pack `super.img`:** Follow [docs/MANUAL_INTEGRATION_GUIDE.md](docs/MANUAL_INTEGRATION_GUIDE.md#4-rebuild-erofs-partitions-and-pack-superimg).
 
 ---

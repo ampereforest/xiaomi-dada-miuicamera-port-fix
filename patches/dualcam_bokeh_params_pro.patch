@@ -2,9 +2,7 @@ diff --git a/odm/etc/camera/dualcam_bokeh_params_pro.json b/odm/etc/camera/dualc
 index b5a8531..8e788ba 100644
 --- a/odm/etc/camera/dualcam_bokeh_params_pro.json
 +++ b/odm/etc/camera/dualcam_bokeh_params_pro.json
-@@ -44,9 +44,9 @@
-     },
-     "StructDofMethod": {
+@@ -46,5 +46,5 @@
        "DofRadMethond": 1,
 -      "useConstDR": 1,
 -      "dRColse": 2.0,
@@ -13,11 +11,7 @@ index b5a8531..8e788ba 100644
 +      "dRColse": 0.8,
 +      "dRFar": 0.8,
        "foreSupRatio": 0.5
-     },
-     "StructDof": {
-@@ -102,36 +102,36 @@
-         "af_1_3": 1444.423,
-         "af_0_4": 120000,
+@@ -104,32 +104,32 @@
          "af_1_4": 2003.085,
 -        "dof_0_0_0": 13,
 -        "dof_0_1_0": 13,
@@ -80,5 +74,3 @@ index b5a8531..8e788ba 100644
 +        "lut_gamma_0_0_4": 0.85,
 +        "lut_gamma_0_1_4": 0.85
        }
-     },
-     "StructDofRefine": {

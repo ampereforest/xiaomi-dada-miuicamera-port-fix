@@ -2,44 +2,28 @@ diff --git a/odm/etc/camera/dualcam_predepth_params_pro.json b/odm/etc/camera/du
 index 7e9f93a..fe8a4b4 100644
 --- a/odm/etc/camera/dualcam_predepth_params_pro.json
 +++ b/odm/etc/camera/dualcam_predepth_params_pro.json
-@@ -15,7 +15,7 @@
-     },
-     "StructDenseNN": {
+@@ -17,3 +17,3 @@
        "paramSwitch": 1,
 -      "paramDeploySwitchA": 0,
 +      "paramDeploySwitchA": 1,
        "paramDeploySwitchB": 1,
-       "paramDeploySwitchC": 1,
-       "paramDeploySwitchD": 1,
-@@ -24,7 +24,7 @@
-         "paramVer": "kd.21.90",
-         "paramDepthW": 1024,
+@@ -26,3 +26,3 @@
          "paramDepthH": 768,
 -        "paramDepthQSL": 0.000072317373,
 +        "paramDepthQSL": 7.2317373e-05,
          "paramDepthQOL": -29158.0,
-         "paramDepthQSS": 0.000985416467,
-         "paramDepthQOS": -3471.0,
-@@ -35,11 +35,11 @@
-         "paramVer": "8.14",
-         "paramDepthW": 512,
+@@ -37,3 +37,3 @@
          "paramDepthH": 512,
 -        "paramDepthQSL": 0.000072317373,
 +        "paramDepthQSL": 7.2317373e-05,
          "paramDepthQOL": -29158.0,
-         "paramDepthQSS": 0.000799827103,
+@@ -41,3 +41,3 @@
          "paramDepthQOS": -3428.0,
 -        "paramDepthQSM": 0.000015169498,
 +        "paramDepthQSM": 1.5169498e-05,
          "paramDepthQOM": 0.0,
-         "paramDepthQSD": 0.001107566874,
-         "paramDepthQOD": -5324.0
-@@ -54,6 +54,6 @@
-       "paramBmDspSwitch": 1,
-       "paramMatteGpuSwitch": 1
+@@ -56,3 +56,3 @@
      },
 -    "paramIsTrustAfCode": 1
 +    "paramIsTrustAfCode": 0
    }
- }
-\ No newline at end of file
