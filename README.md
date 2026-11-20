@@ -30,7 +30,7 @@ A pure ODM configuration fix, shipped as three unified diffs. The repository con
 
 ### Changed Files
 
-| File (`odm/etc/camera/`) | SHA-256 | Key changes vs. OEM |
+| Resulting file (generated locally, not shipped) | SHA-256 | Key changes vs. OEM |
 | :--- | :--- | :--- |
 | `dualcam_depth_params_pro.json` | `0ebbf6aabd541d908204d559ad349ae24d8f7c308fd245404aa2491a9692fb4c` | `StructB.{NORMAL,HOT,HARD}`: `StructRear.paramD` `64→96`; `StructSGBM.paramU` `30/20→12`, `paramH` `200→80`, `paramI` `16→8`, `paramSP` `1→0`; `StructBM.paramT` `500→150`. `StructI.paramT` `200→80`. `StructMt`: `paramMtS` `1→0`, `paramIuxT` `400→9999`. `StructPostProSwitch`: `paramSDR` `1→0`, `paramSDRT` `0.03→0.0`. |
 | `dualcam_predepth_params_pro.json` | `254c690adf666dbf5d9a33929225d3a7bf646feb225f86b75759a6570c599882` | `StructDenseNN.paramDeploySwitchA` `0→1`; `paramIsTrustAfCode` `1→0`. |
@@ -49,7 +49,7 @@ Verified on Xiaomi 15 (`dada`) running ColorOS 17, Portrait mode, with the produ
 
 ### Applying (Patches Only)
 
-The repository ships only the three patches. Each patch targets the stock ODM file, so you must start from stock OEM JSONs. Pull them from a device whose `/odm` still runs OEM configs. A device that already has these changes staged will fail to apply the patches.
+The repository ships only the three patches. Each patch targets the stock ODM file, so you must start from stock OEM JSONs. The patches were built against the `OS4.0.0.11.XOCMIXM` ODM configs. Other builds may have different context and fail to apply. Pull the files from a device whose `/odm` still runs OEM configs. A device that already has these changes staged will fail to apply the patches. If `adb pull` is denied, use `adb root` on a userdebug build, or copy the files with `adb shell su -c cat`.
 
 Run this from a working directory of your choice:
 
@@ -68,20 +68,20 @@ patch -p1 < /path/to/xiaomi-dada-miuicamera-port-fix/patches/dualcam_depth_param
 patch -p1 < /path/to/xiaomi-dada-miuicamera-port-fix/patches/dualcam_predepth_params_pro.patch
 patch -p1 < /path/to/xiaomi-dada-miuicamera-port-fix/patches/dualcam_bokeh_params_pro.patch
 
-# 4. Check the results against the verified hashes
+# 4. Check the patched results against the verified hashes
 sha256sum odm/etc/camera/dualcam_*_params_pro.json
 #   0ebbf6aa...  dualcam_depth_params_pro.json
 #   254c690a...  dualcam_predepth_params_pro.json
 #   1d74901b...  dualcam_bokeh_params_pro.json
 
-# 5. Push back to a Magisk module overlay with the required label and mode
+# 5. Install into a Magisk module overlay (mode 0644, root:root, vendor_configs_file label)
 adb push odm/etc/camera/dualcam_depth_params_pro.json    /data/local/tmp/
 adb push odm/etc/camera/dualcam_predepth_params_pro.json /data/local/tmp/
 adb push odm/etc/camera/dualcam_bokeh_params_pro.json    /data/local/tmp/
 adb shell su -c 'D=/data/adb/modules/<your_module>/system/odm/etc/camera; mkdir -p $D && for f in dualcam_depth_params_pro dualcam_predepth_params_pro dualcam_bokeh_params_pro; do install -m 0644 -o root -g root /data/local/tmp/$f.json $D/$f.json && chcon u:object_r:vendor_configs_file:s0 $D/$f.json; done'
 ```
 
-Replace `<your_module>` with your Magisk module name, then reboot. The patched files are generated locally and must never be committed to this repository.
+Replace `<your_module>` with your Magisk module name, then reboot. Verify the boot with the same `sha256sum` check. The patched JSON files are generated locally and must never be committed to this repository.
 
 ---
 
