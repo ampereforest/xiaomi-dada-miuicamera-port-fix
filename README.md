@@ -14,6 +14,7 @@ Permanent native framework shims, `MiuiCamera.apk` smali/adaptive-icon patches, 
 | **Pro 50MP RAW & Ultra RAW** | Green/corrupt `8192x6144` DNG metadata mismatch & missing DNG preview thumbnail (`SubIFD[0]`) | (1) `DngCreator` lacks 2x full-res sensor array fallback & `Xiaomi Ultra RAW` 14-bit (`0..16383`) overrides; (2) ColorOS `libandroid_runtime.so` lacks HyperOS `DngCreator.writeJpeg(IILjava/nio/ByteBuffer;)V` | `libdada_rtfix.so` (`DT_NEEDED` in `/system/lib64/libandroid_runtime.so`) + `n7/x.smali` `embedPreviewThumb()` generating `256x192` `ARGB_8888` `setThumbnail()` | `8192x6144` 10-bit Pro RAW + `4096x3072` 14-bit Ultra RAW with crisp `256x192` `SubIFD[0]` |
 | **Portrait Mode Bokeh (`1x` / `1.5x` / `2.6x`)** | Zero depth blur on the `1x` / `1.5x` Wide+UW path, or half-screen blur dropouts (Mono fallback) indoors; weak blur on non-human foreground objects | (1) `StructRear.paramD=64` + strict SGBM leave most of `sp_disp_map` empty at close range; (2) DenseNN near-depth prior + `useConstDR=1, dR=2.0/2.2`; (3) `StructMt.paramIuxT=400` forces indoor Dual→Mono fallback; (4) `StructCalDofRadius_Mono` attenuates non-face blur 4x–60x | Patches to ODM camera configs (`dualcam_depth`, `dualcam_predepth`, `dualcam_bokeh`); no `.so` or `MiuiCamera.apk` changes | Verified on a non-human scene: 3/3 consecutive `1x` `f/0.95` shots, lower-left light-bulb blur `BL` `0.03` → `0.63–1.28`. Human subjects not yet verified (see Known Limitations) |
 | **Launcher Icon (Classic + Flux)** | Legacy HyperOS icon; missing ColorOS 17 `<adaptive-icon>` & `<monochrome>` layers | Ported `MiuiCamera.apk` shipped only legacy `.webp` icons; native `monochrome.png` (`92/180`) also scales smaller than ColorOS 17 Flux icons | `icon_port/port_coloros_icon.py` (`alpha_composite()`, `S_FG=0.96`, `S_MONO=1.524`) + `flb.xml` + `android:roundIcon="@mipmap/flb"` | Classic `halo/sq=0.914` (`center=(0,0)`); Flux `mono/sq=0.7812` (`+0.56%` vs native) |
+| **Top Chevron (`v`) / Swipe-Down Menu Crash** | Instant `FileNotFoundException` crash (`obfu_res/res/drawable/ic_west_coast_princess.webp`) when tapping top chevron or swiping down in Photo & Video modes | `LSf/a;->b` checks `LPf/a;->a` obfuscated-resource set and calls `LSf/a;->c` (`AssetManager.open("obfu_res/...")`) with no `FileNotFoundException` catch when an obfuscated asset is absent | `patches/miuicamera-top-menu-obfu-res-fallback.patch` (`classes3.dex` `LSf/a;->b` `try/catch (FileNotFoundException)` fallback to `LY/f$a;->a(resources, resId, theme)`) | 0 crashes across Photo & Video top-chevron tap and swipe-down; 50MP & Portrait bokeh preserved |
 
 ---
 
@@ -85,6 +86,27 @@ Replace `<your_module>` with your Magisk module name, then reboot. Verify the bo
 
 ---
 
+## Top-Chevron (`v`) / Swipe-Down Menu Crash Fix (`classes3.dex` Smali)
+
+### Root Cause
+Tapping the top menu chevron (`v`) or swiping down on the viewfinder in Photo and Video modes resolves a top-menu icon via `LSf/a;->b(Landroid/content/res/Resources;ILandroid/content/res/Resources$Theme;)Landroid/graphics/drawable/Drawable;`. When the resource ID is listed in `LPf/a;->a(Resources)`, `LSf/a;->b` calls `LSf/a;->c`, which opens `obfu_res/res/drawable/ic_west_coast_princess.webp` via `AssetManager.open(...)` without catching `java.io.FileNotFoundException`, crashing the app immediately.
+
+### Applying the Patch
+Apply `patches/miuicamera-top-menu-obfu-res-fallback.patch` to disassembled `classes3.dex` (`smali_classes3/Sf/a.smali`), wrapping `LSf/a;->c(...)` in `try/catch (FileNotFoundException)` so missing `obfu_res/` drawables fall through cleanly to `LY/f$a;->a(resources, resId, theme)` (`Resources.getDrawable()`):
+
+```bash
+baksmali d classes3.dex -o smali_classes3
+patch -p1 < /path/to/xiaomi-dada-miuicamera-port-fix/patches/miuicamera-top-menu-obfu-res-fallback.patch
+smali a smali_classes3 -o classes3.dex
+# Repack classes3.dex into MiuiCamera.apk, zipalign -P 16 -f 4, and re-sign (v1+v2+v3, no .idsig)
+```
+
+### Verified Results
+- **0 crashes** across repeated top-chevron (`v`) taps and viewfinder swipe-downs in both **Photo** and **Video** modes on Xiaomi 15 (`dada`) ColorOS 17.
+- **Zero regressions** to 50MP Ultra HD, Pro RAW/Ultra RAW, and Portrait Mode bokeh.
+
+---
+
 ## Repository Layout
 
 ```text
@@ -99,12 +121,13 @@ Replace `<your_module>` with your Magisk module name, then reboot. Verify the bo
 │   ├── patch_elf_needed.py           # Clean AArch64 ELF64 PT_LOAD + DT_NEEDED injector
 │   └── build.sh                      # Android NDK r26+ C++ build script
 ├── patches/
-│   ├── miuicamera_dng_thumbnail.patch    # Unified diff for smali/n7/x.smali
-│   ├── miuicamera_adaptive_icon.patch    # Unified diff for AndroidManifest.xml + flb.xml
-│   ├── dualcam_predepth_params_pro.patch # DenseNN switch & paramIsTrustAfCode = 0
-│   ├── dualcam_depth_params_pro.patch    # Stereo SGBM/BM/Mt tuning, paramSDR = 0, paramSDRT = 0.0
-│   ├── dualcam_bokeh_params_pro.patch    # DoF method & non-human Mono blur LUT
-│   └── odm_build_prop.txt                # Persistent capdepth/capbokeh debuglitemode=0 props
+│   ├── miuicamera_dng_thumbnail.patch             # Unified diff for smali/n7/x.smali
+│   ├── miuicamera_adaptive_icon.patch             # Unified diff for AndroidManifest.xml + flb.xml
+│   ├── miuicamera-top-menu-obfu-res-fallback.patch # Unified diff for smali_classes3/Sf/a.smali (top-chevron crash fix)
+│   ├── dualcam_predepth_params_pro.patch          # DenseNN switch & paramIsTrustAfCode = 0
+│   ├── dualcam_depth_params_pro.patch             # Stereo SGBM/BM/Mt tuning, paramSDR = 0, paramSDRT = 0.0
+│   ├── dualcam_bokeh_params_pro.patch             # DoF method & non-human Mono blur LUT
+│   └── odm_build_prop.txt                         # Persistent capdepth/capbokeh debuglitemode=0 props
 └── icon_port/
     ├── port_coloros_icon.py          # Straight-alpha adaptive + Flux monochrome generator
     ├── flb.xml                       # <adaptive-icon> template with <monochrome>
